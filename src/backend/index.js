@@ -37,14 +37,46 @@ app.get('/devices/', function(req, res, next) {
             'id': 1, 
             'name': 'Lampara 1', 
             'description': 'Luz living', 
-            'state': 0, 
+            'state': 1, 
             'type': 1, 
         },
         { 
             'id': 2, 
             'name': 'Ventilador 1', 
             'description': 'Ventilador Habitacion', 
+            'state': 0, 
+            'type': 2, 
+            
+        },
+        { 
+            'id': 3, 
+            'name': 'Velador', 
+            'description': 'Velador living', 
             'state': 1, 
+            'type': 1, 
+            
+        },
+        { 
+            'id': 4, 
+            'name': 'Persiana 1', 
+            'description': 'Persiana living', 
+            'state': 1, 
+            'type': 2, 
+            
+        },
+        { 
+            'id': 5, 
+            'name': 'Persiana 2', 
+            'description': 'Persiana de la cocina', 
+            'state': 1, 
+            'type': 2, 
+            
+        },
+        { 
+            'id': 6, 
+            'name': 'Persiana 3', 
+            'description': 'Persiana balcon', 
+            'state': 0, 
             'type': 2, 
             
         },

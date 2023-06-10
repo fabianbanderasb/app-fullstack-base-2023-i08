@@ -56,8 +56,8 @@
 
                 <br />
 
-                <h3>Smart Home Web Client!</h3>
-
+                <h3>Home IoT!</h3>
+                <!---
                 <div class="row">
                     <div class="input-field col s12 xl6">
                         <i class="material-icons prefix " color="secondary">accessibility</i>
@@ -73,8 +73,7 @@
                 <input type="text" class="datepicker">
                 <p id="parrafo"></p>
                 <input type="button" class="btn" id="btnLogin" value="Login">
-         
-             
+                
                 <br/>
                 <div class="row">
                     <div class="input-field col s12 m12 l12 xl12">
@@ -93,6 +92,9 @@
                         <label>Materialize Multiple Select</label>
                       </div>
                 </div>
+                
+                --->
+
                 <div >
                       <!-- Switch -->
 
@@ -103,10 +105,10 @@
                 </div>
                 <div class="row">
                     <div class="col s12 m8 l4 xl6">
-                        <button class="btn waves-effect waves-light button-view" id="btnListar">Listar</button>
+                        <button class="btn waves-effect waves-light button-view" id="btnListar">List</button>
                     </div>
                     <div class="col s12 m4 l8 xl6 ">
-                        <button class="btn waves-effect waves-light button-view" id="btnAgregar">Agregar</button>
+                        <button class="btn waves-effect waves-light button-view" id="btnAgregar">Add</button>
                     </div>
                 </div>
             </div>	
@@ -117,7 +119,12 @@
                 <div class="row">
                     <div class="col l6 s6">
                         <h5 class="white-text">Smart Home</h5>
-                        <p class="grey-text text-lighten-4">Copyright ### - 2021</p>
+                        <!---<p class="grey-text text-lighten-4">Copyright Fabián Banderas - 2021</p>--->
+                        <p id="year" class="grey-text text-lighten-4"></p>
+                        <script>
+                        var year = new Date().getFullYear();
+                        document.getElementById("year").innerHTML = "Copyright Fabián Banderas - " + year;
+                        </script>
                     </div>
                     <div class="col l6 s6">
                         <h5 class="white-text right-align">Contact</h5>
