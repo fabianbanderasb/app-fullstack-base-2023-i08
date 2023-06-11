@@ -15,7 +15,7 @@ Realizando estas tareas vas a a tener una aplicación fullstack IoT del mundo re
 
 En esta imagen podés ver una posible implementación del cliente web que controla los artefactos del hogar.
 
-![architecture](doc/webapp-example-1.png)
+![architecture](doc/webapp-daw.png)
 
 ## Comenzando 🚀
 
@@ -38,7 +38,7 @@ Continua con la descarga del código cuando tengas las dependencias instaladas y
 Para descargar el código, lo más conveniente es que realices un `fork` de este proyecto a tu cuenta personal haciendo click en [este link](https://github.com/gotoiot/app-fullstack-base/fork). Una vez que ya tengas el fork a tu cuenta, descargalo con este comando (acordate de poner tu usuario en el link):
 
 ```
-git clone https://github.com/USER/app-fullstack-base.git
+git clone https://github.com/fabianbanderasb/app-fullstack-base-2023-i08.git
 ```
 
 > En caso que no tengas una cuenta en Github podes clonar directamente este repo.
@@ -240,6 +240,7 @@ Si te gustó este proyecto y quisieras apoyarlo, cualquiera de estas acciones es
 
 Las colaboraciones principales fueron realizadas por:
 
+* **[Fabián Banderas](https://github.com/fabianbanderasb)**: Ejecución y modificación.
 * **[Agustin Bassi](https://github.com/agustinBassi)**: Ideación, puesta en marcha y mantenimiento del proyecto.
 * **[Ernesto Giggliotti](https://github.com/ernesto-g)**: Creación inicial del frontend, elección de Material Design.
 * **[Brian Ducca](https://github.com/brianducca)**: Ayuda para conectar el backend a la base de datos, puesta a punto de imagen de Docker.
@@ -252,4 +253,4 @@ Este proyecto está bajo Licencia ([MIT](https://choosealicense.com/licenses/mit
 
 ---
 
-**Copyright © Goto IoT 2021** ⌨️ [**Website**](https://www.gotoiot.com) ⌨️ [**Group**](https://groups.google.com/g/gotoiot) ⌨️ [**Github**](https://www.github.com/gotoiot) ⌨️ [**Twitter**](https://www.twitter.com/gotoiot) ⌨️ [**Wiki**](https://github.com/gotoiot/doc/wiki)
+**Copyright © Goto IoT 2023** ⌨️ [**Website**](https://www.gotoiot.com) ⌨️ [**Group**](https://groups.google.com/g/gotoiot) ⌨️ [**Github**](https://www.github.com/gotoiot) ⌨️ [**Twitter**](https://www.twitter.com/gotoiot) ⌨️ [**Wiki**](https://github.com/gotoiot/doc/wiki)

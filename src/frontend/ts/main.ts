@@ -23,11 +23,12 @@ class Main implements EventListenerObject,HttpResponse {
         var ulDisp = document.getElementById("listaDisp");
         for (var disp of lista) {
             var item: string = `<li class="collection-item avatar">`;
-                    if(disp.type==1){
-                      item+=  '<img src="static/images/lightbulb.png" alt = "" class="circle" >'
-                    } else {
-                        item+=  '<img src="static/images/window.png" alt = "" class="circle" >'
-                    }
+            if(disp.type==1){
+                item+=  '<img src="static/images/lightbulb.png" alt = "" class="circle" >'
+            } else{
+                item+=  '<img src="static/images/window.png" alt = "" class="circle" >'
+              }
+            
                           
                         item+=`<span class="titulo">${disp.name}</span>
                           <p>
@@ -98,7 +99,7 @@ class Main implements EventListenerObject,HttpResponse {
             //Ir al backend y aviasrle que el elemento cambio de estado
             //TODO armar un objeto json con la clave id y status y llamar al metodo ejecutarBackend
            
-            alert("El elemento " + elemento.id + " cambia de estado a =" + elemento.checked);
+            alert("El elemento " + elemento.id + " cambia de estado a = " + elemento.checked);
           
         }else {
             //TODO cambiar esto, recuperadon de un input de tipo text
