@@ -1,136 +1,401 @@
-var M;
+declare const M;
 
-class Main implements EventListenerObject,HttpResponse {
-    users: Array<Usuario> = new Array();
-    framework: Framework = new Framework();
-   
-    constructor() {
-        var usr1 = new Usuario("mramos", "Matias");
-        var usr2 = new Usuario("jlopez", "Juan");
+class Main implements EventListenerObject, HttpResponse {
+  private framework: Framework = new Framework();
+  private devices: Device[];
+  private apiUrl: string = "http://localhost:8000/api/devices";
 
+  constructor() {
+    this.getDevices();
+  }
 
-        this.users.push(usr1);
-        this.users.push(usr2);
+  // Request to API to get all the devices
+  private getDevices(): void {
+    this.framework.executeRequest("GET", this.apiUrl, this);
+  }
 
-        var obj = { "nombre": "Matias", "edad": 35, "masculino": true };
-        //alert(JSON.stringify(obj));
+  // Request to API to update a device
+  private putDevice(device: Device): void {
+    this.framework.executeRequest(
+      "PUT",
+      `${this.apiUrl}/${device.id}`,
+      this,
+      device
+    );
+  }
 
-    }
-    manejarRespueta(respueta: string) {
-        var lista: Array<Device> = JSON.parse(respueta);
+  // Request to API to create a device
+  private createDevice(device: Device): void {
+    this.framework.executeRequest("POST", this.apiUrl, this, device);
+  }
 
-        
-        var ulDisp = document.getElementById("listaDisp");
-        for (var disp of lista) {
-            var item: string = `<li class="collection-item avatar">`;
-            if(disp.type==1){
-                item+=  '<img src="static/images/lightbulb.png" alt = "" class="circle" >'
-            } else{
-                item+=  '<img src="static/images/window.png" alt = "" class="circle" >'
-              }
-            
-                          
-                        item+=`<span class="titulo">${disp.name}</span>
-                          <p>
-                          ${disp.description}
-                          </p>
-                          <a href="#!" class="secondary-content">
-                          <div class="switch">
-                          <label>
-                            Off
-                            `;
-                            if (disp.state) {
-                                item +=`<input type="checkbox" checked id="ck_${disp.id}">`;
-                            } else {
-                                item +=`<input type="checkbox" id="ck_${disp.id}" >`;
-                            }
-                            item += `
-                            <span class="lever"></span>
-                            On
-                          </label>
-                        </div>
-                          </a>
-                        </li>`;
-            
-            ulDisp.innerHTML += item;
+  // Request to API to delete a device
+  private deleteDevice(id: number): void {
+    this.framework.executeRequest("DELETE", `${this.apiUrl}/${id}`, this);
+  }
+
+  // Show an error message
+  public showError(message: string): void {
+    M.toast({ html: message });
+  }
+
+  // Push a device to array and executes renderDevices method. Show a toast for confirm the operation
+  public addDevice(device: Device): void {
+    this.devices.push(device);
+    this.renderDevices([device]);
+    M.toast({ html: `DISPOSITIVO ${device.id} CREADO CON ÉXITO` });
+  }
+
+  // Update a specific device from array and executes renderDeviceUpdated method. Show a toast for confirm the operation
+  public updateDevice(device: Device): void {
+    const deviceIndex = this.devices.findIndex(
+      (d) => d.id == Number(device.id)
+    );
+    this.devices[deviceIndex] = device;
+    this.renderDeviceUpdated(device);
+    M.toast({ html: `DISPOSITIVO ${device.id} ACTUALIZADO CON ÉXITO` });
+  }
+
+  // Remove a specific device from array and DOM. Show a toast for confirm the operation
+  public removeDevice(id: number): void {
+    const deviceIndex = this.devices.findIndex((d) => d.id == Number(id));
+    this.devices.splice(deviceIndex, 1);
+
+    const deviceCard = document.getElementById(`device_${id}`);
+    deviceCard.remove();
+
+    M.toast({ html: `DISPOSITIVO ${id} BORRADO CON ÉXITO` });
+  }
+
+  // Set devices array and executes renderDevices method
+  public loadDevices(devices: Device[]): void {
+    this.devices = devices;
+    this.renderDevices(devices);
+  }
+
+  // Render list of devices in DOM
+  private renderDevices(devices: Device[]): void {
+    const deviceWrapperElement: HTMLElement =
+      document.getElementById("device-wrapper");
+    let deviceCardList: string = "";
+
+    for (const device of devices) {
+      let deviceToggle: string;
+      if (
+        device.type == DeviceType.ac_unit ||
+        device.type == DeviceType.toys_fan ||
+        device.type == DeviceType.window_closed
+      ) {
+        deviceToggle = `
+          <p class="range-field">
+              <input type="range" id="range_${device.id}" min="0" max="100" value="${device.state}" />
+          </p>
+      `;
+      } else {
+        if (device.state) {
+          deviceToggle = `
+          <div class="switch">
+              <label>
+                  <input type="checkbox" id="switch_${device.id}" checked/>
+                  <span class="lever"></span>
+              </label>
+          </div>`;
+        } else {
+          deviceToggle = `
+          <div class="switch">
+              <label>
+                  <input type="checkbox" id="switch_${device.id}" />
+                  <span class="lever"></span>
+              </label>
+          </div>`;
         }
-        
-        for (var disp of lista) {
-            var checkPrender = document.getElementById("ck_" + disp.id);
-            checkPrender.addEventListener("click", this);
+      }
 
-            
+      const deviceCard: string = `
+      <div id="device_${device.id}" class="col s12 m6 l4">
+          <div class="card indigo darken-1">
+              <div class="card-content white-text">
+                  <i id="device-icon_${
+                    device.id
+                  }" class="material-symbols-outlined">
+                      ${DeviceType[device.type]}
+                  </i>
+                  <span id="device-name_${device.id}" class="card-title">
+                    ${device.name}
+                  </span>
+                  <p id="device-description_${
+                    device.id
+                  }" class="card-description">
+                    ${device.description}
+                  </p>
+                  <div id="device-toggle_${device.id}">
+                    ${deviceToggle}
+                  </div>
+              </div>
+              <div class="card-action">
+                  <button id="edit_${
+                    device.id
+                  }" data-target="modal-update" class="btn darken-1 waves-effect waves-light modal-trigger">ACTUALIZAR</button>
+                  <button id="delete_${
+                    device.id
+                  }" class="btn darken-1 waves-effect waves-light">BORRAR</button>
+              </div>
+          </div>
+      </div>
+    `;
+      deviceCardList += deviceCard;
+    }
 
+    deviceWrapperElement.innerHTML += deviceCardList;
+
+    for (let device of devices) {
+      let deviceToggle;
+      if (
+        device.type == DeviceType.ac_unit ||
+        device.type == DeviceType.toys_fan ||
+        device.type == DeviceType.window_closed
+      ) {
+        deviceToggle = document.getElementById(`range_${device.id}`);
+      } else {
+        deviceToggle = document.getElementById(`switch_${device.id}`);
+      }
+
+      deviceToggle.addEventListener("click", this);
+
+      const deviceDelete = document.getElementById(`delete_${device.id}`);
+      deviceDelete.addEventListener("click", this);
+
+      const deviceUpdate = document.getElementById(`edit_${device.id}`);
+      deviceUpdate.addEventListener("click", this);
+    }
+  }
+
+  // Update the values in DOM for a rendered device
+  private renderDeviceUpdated(device: Device): void {
+    document.getElementById(`device-name_${device.id}`).innerHTML = device.name;
+    document.getElementById(`device-description_${device.id}`).innerHTML =
+      device.description;
+    document.getElementById(`device-icon_${device.id}`).innerHTML =
+      DeviceType[device.type];
+
+    let deviceToggle;
+    const deviceToggleWrapperElement: HTMLElement = document.getElementById(
+      `device-toggle_${device.id}`
+    );
+    if (
+      device.type == DeviceType.ac_unit ||
+      device.type == DeviceType.toys_fan ||
+      device.type == DeviceType.window_closed
+    ) {
+      deviceToggle = document.getElementById(`switch_${device.id}`);
+      if (deviceToggle) {
+        deviceToggle = `
+          <p class="range-field">
+              <input type="range" id="range_${device.id}" min="0" max="100" value="${device.state}" />
+          </p>
+        `;
+
+        deviceToggleWrapperElement.innerHTML = deviceToggle;
+
+        deviceToggle = document.getElementById(`range_${device.id}`);
+        deviceToggle.addEventListener("click", this);
+      }
+    } else {
+      deviceToggle = document.getElementById(`range_${device.id}`);
+
+      if (deviceToggle) {
+        if (device.state) {
+          deviceToggle = `
+          <div class="switch">
+              <label>
+                  <input type="checkbox" id="switch_${device.id}" checked/>
+                  <span class="lever"></span>
+              </label>
+          </div>`;
+        } else {
+          deviceToggle = `
+          <div class="switch">
+              <label>
+                  <input type="checkbox" id="switch_${device.id}" />
+                  <span class="lever"></span>
+              </label>
+          </div>`;
         }
-        
+
+        deviceToggleWrapperElement.innerHTML = deviceToggle;
+        deviceToggle = document.getElementById(`switch_${device.id}`);
+        deviceToggle.addEventListener("click", this);
+      }
     }
-    obtenerDispositivo() {
-        this.framework.ejecutarBackEnd("GET", "http://localhost:8000/devices",this);
+  }
+
+  // Handler for events
+  public handleEvent(object: Event): void {
+    let event: HTMLElement;
+    event = <HTMLElement>object.target;
+
+    if (event.id.startsWith("switch_")) {
+      const value = (<HTMLInputElement>event).checked;
+      const idDevice = Number(event.id.replace("switch_", ""));
+      this.handleUpdateStateDevice(idDevice, value);
+    } else if (event.id.startsWith("range_")) {
+      const value = (<HTMLInputElement>event).checked;
+      const idDevice = Number(event.id.replace("range_", ""));
+      this.handleUpdateStateDevice(idDevice, value);
+    } else if (event.id == "submit-create") {
+      this.handleCreateDevice();
+    } else if (event.id == "submit-update") {
+      this.handleUpdateDevice();
+    } else if (event.id.startsWith("delete_")) {
+      const idDevice = Number(event.id.replace("delete_", ""));
+      this.handleDeleteDevice(idDevice);
+    } else if (event.id.startsWith("edit_")) {
+      const idDevice = Number(event.id.replace("edit_", ""));
+      this.handleModalUpdateDevice(idDevice);
     }
+  }
 
-    handleEvent(event) {
-        var elemento =<HTMLInputElement> event.target;
-        console.log(elemento)
-        if (event.target.id == "btnListar") {
-            this.obtenerDispositivo();
-            for (var user of this.users) {
+  // Updates device list and executes putDevice method
+  private handleUpdateStateDevice(id: number, value: boolean): void {
+    const deviceIndex = this.devices.findIndex((d) => d.id == id);
+    const device = this.devices[deviceIndex];
+    device.state = value;
+    this.putDevice(device);
+  }
 
-                //TODO cambiar ESTO por mostrar estos datos separados por "-" 
-                //en un parrafo "etiqueta de tipo <p>"
-              
-            }
-        } else if (event.target.id == "btnLogin") {
+  // Get form elements value and executes createDevice method
+  private handleCreateDevice(): void {
+    const nameValue = (<HTMLInputElement>document.getElementById("name-create"))
+      .value;
+    const descriptionValue = (<HTMLTextAreaElement>(
+      document.getElementById("description-create")
+    )).value;
+    const typeValue = (<HTMLSelectElement>(
+      document.getElementById("type-create")
+    )).value;
 
-            var iUser = <HTMLInputElement>document.getElementById("iUser");
-            var iPass = <HTMLInputElement>document.getElementById("iPass");
-            var username: string = iUser.value;
-            var password: string = iPass.value;
+    const device: Device = {
+      name: nameValue,
+      description: descriptionValue,
+      type: Number(typeValue),
+    };
 
-            if (username.length > 3 && password.length>3) {
-                
-                //iriamos al servidor a consultar si el usuario y la cotraseña son correctas
-                var parrafo = document.getElementById("parrafo");
-                parrafo.innerHTML = "Espere...";
-            } else {
-                alert("el nombre de usuario es invalido");
-            }
+    if (this.deviceDataIsValid(device)) {
+      this.createDevice(device);
 
-        } else if (elemento.id.startsWith("ck_")) {
-            //Ir al backend y aviasrle que el elemento cambio de estado
-            //TODO armar un objeto json con la clave id y status y llamar al metodo ejecutarBackend
-           
-            alert("El elemento " + elemento.id + " cambia de estado a = " + elemento.checked);
-          
-        }else {
-            //TODO cambiar esto, recuperadon de un input de tipo text
-            //el nombre  de usuario y el nombre de la persona
-            // validando que no sean vacios
-            console.log("yendo al back");
-            this.framework.ejecutarBackEnd("POST", "http://localhost:8000/device", this, {});
-           
-        }
+      const modalElement = document.getElementById("modal-create");
+      const modalInstance = M.Modal.getInstance(modalElement);
+      modalInstance.close();
+
+      this.resetForm();
+    } else {
+      this.showError("LOS DATOS DEL DISPOSITIVO NO SON VÁLIDOS");
     }
+  }
+
+  // Set values of update form elements and executes putDevice method
+  private handleUpdateDevice(): void {
+    const idValue = Number(
+      (<HTMLInputElement>document.getElementById("id-update")).value
+    );
+    const nameValue = (<HTMLInputElement>document.getElementById("name-update"))
+      .value;
+    const descriptionValue = (<HTMLTextAreaElement>(
+      document.getElementById("description-update")
+    )).value;
+    const typeValue = (<HTMLSelectElement>(
+      document.getElementById("type-update")
+    )).value;
+
+    const deviceIndex = this.devices.findIndex((d) => d.id == idValue);
+    const stateValue = this.devices[deviceIndex].state;
+
+    const device: Device = {
+      id: idValue,
+      name: nameValue,
+      description: descriptionValue,
+      type: Number(typeValue),
+      state: stateValue,
+    };
+
+    if (this.deviceDataIsValid(device)) {
+      this.putDevice(device);
+
+      const modalElement = document.getElementById("modal-update");
+      const modalInstance = M.Modal.getInstance(modalElement);
+      modalInstance.close();
+
+      this.resetForm();
+    } else {
+      this.showError("LOS DATOS DEL DISPOSITIVO NO SON VÁLIDOS");
+    }
+  }
+
+  private handleDeleteDevice(id: number): void {
+    this.deleteDevice(id);
+  }
+
+  // Set values of update form elements and executes updateFormMaterialize method
+  private handleModalUpdateDevice(id: number): void {
+    const deviceIndex = this.devices.findIndex((d) => d.id == id);
+    const device = this.devices[deviceIndex];
+    (<HTMLInputElement>document.getElementById("id-update")).value = String(
+      device.id
+    );
+    (<HTMLInputElement>document.getElementById("name-update")).value =
+      device.name;
+    (<HTMLTextAreaElement>document.getElementById("description-update")).value =
+      device.description;
+    (<HTMLSelectElement>document.getElementById("type-update")).value = String(
+      device.type
+    );
+    this.updateFormMaterialize();
+  }
+
+  // Reset form elements of modal and executes updateFormMaterialize method
+  private resetForm(): void {
+    (<HTMLInputElement>document.getElementById("name-create")).value = null;
+    (<HTMLTextAreaElement>document.getElementById("description-create")).value =
+      null;
+    (<HTMLSelectElement>(
+      document.getElementById("type-create")
+    )).selectedIndex = 0;
+    this.updateFormMaterialize();
+  }
+
+  // Update the rendered values in DOM of Materialize form elements
+  private updateFormMaterialize(): void {
+    M.updateTextFields();
+    const selectElements = document.querySelectorAll("select");
+    M.FormSelect.init(selectElements, "");
+  }
+
+  // Checks if device data is valid
+  private deviceDataIsValid(device: Device): boolean {
+    return (
+      "name" in device &&
+      device.name !== "" &&
+      "description" in device &&
+      device.description !== "" &&
+      "type" in device &&
+      device.type in DeviceType
+    );
+  }
 }
 
-
+// Listener for when the page load
 window.addEventListener("load", () => {
+  const modalElements = document.querySelectorAll(".modal");
+  M.Modal.init(modalElements, "");
 
-    var elems = document.querySelectorAll('select');
-    var instances = M.FormSelect.init(elems,{});
-    var elemsC = document.querySelectorAll('.datepicker');
-    var instances = M.Datepicker.init(elemsC, {autoClose:true});
+  const selectElements = document.querySelectorAll("select");
+  M.FormSelect.init(selectElements, "");
 
-    var main: Main = new Main();
-    var btnListar: HTMLElement = document.getElementById("btnListar");
-    btnListar.addEventListener("click", main);
+  const main: Main = new Main();
 
+  const buttonSubmit = document.getElementById("submit-create");
+  buttonSubmit.addEventListener("click", main);
 
-
-
-    var btnAgregar: HTMLElement = document.getElementById("btnAgregar");
-    btnAgregar.addEventListener("click", main);
-
-    var btnLogin = document.getElementById("btnLogin");
-    btnLogin.addEventListener("click", main);
-
+  const buttonUpdate = document.getElementById("submit-update");
+  buttonUpdate.addEventListener("click", main);
 });
